@@ -5,7 +5,6 @@
 
 import heapq
 
-@profile
 def get_ideas_implementing_time(ideas,N,M):
     ideas_for_pm = {}
     avaiable_ideas_for_pm = {}
