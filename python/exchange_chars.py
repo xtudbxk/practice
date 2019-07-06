@@ -52,7 +52,6 @@ def get_max_length_of_substring_has_same_characters_after_exchaing(s,m):
         #print(f"single_index:{single_index},not_moving_char:{not_moving_char}")
         #print(f"max_moving_steps:{max_moving_steps},{right_moving_to_p-left_moving_to_p}")
 
-
     return max_length
 
 
