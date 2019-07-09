@@ -18,4 +18,4 @@ After installing all the libs, you can run the RedBlackTree.py by simple `python
 ### Result
 
 The scirpt would generates a pdf under the folder. And you can see the visualization of the RedBlackTree in the file.
-![RedBlackTree](RedBlackTree.png)
+![RedBlackTree](results/RedBlackTree.png)
