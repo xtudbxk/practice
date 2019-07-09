@@ -4,23 +4,30 @@
 class Node():
     def __init__(self,value,color="black"):
         self.value = value
-        self.left = None
-        self.right = None
-        self.top = None
+        self.neighbor = {"left":None,"right":None,"top":None}
         self.color = color
+    def get_neighbor_key(self,node):
+        return "left" if self.neighbor["left"] is node else ( "right" if self.neighbor["right"] is node else ("top" if self.neighbor["top"] else None))
 
 class RedBlackTree():
     def __init__(self):
         self.root = Node(None) # value为None即为叶节点
 
+    def rotate(self,node,direction):
+        other_direction = "right" if direction is "left" else "left"
+        assert node.neighbor[other_direction] is not None, f"{other_direction} child node is None when {direction} rotating"
+
+        top_node = node.neighbor["top"]
+        node.neighbor[direction]
+
     # 左旋
     def left_rotate(self,node):
-        top_node = node.top
-        right_node = node.right
+        top_node = node.neighbor["top"]
+        right_node = node.neighbor["right"]
         assert right_node is not None,"right child node is None while left rotating"
-        right_left_node = right_node.left
+        right_left_node = right_node.neighbor["left"]
     
-        right_node.top = top_node
+        right_node.neighbor["top"] = top_node
         right_node.left = node
         node.top = right_node
         node.right = right_left_node
