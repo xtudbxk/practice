@@ -47,17 +47,21 @@ def find_cls(query_pair_node,depth,jump):
     # node1 jumps to the same depth with node2
     j = 0
     while(depth_diff > 0):
-        node1 = jump[node1][j]
+        if depth_diff & 0x01 > 0:
+            node1 = jump[node1][j]
         depth_diff >>= 1
         j += 1
 
     # both node1 and node2 jumps
-    j_max = len(jump[node1])-1
-    for j in range(j_max,-1,-1):
-        if jump[node1][j] != jump[node2][j]:
-            node1,node2 = jump[node1][j],jump[node2][j]
+    if node1 is not node2:
+        j_max = len(jump[node1])-1
+        for j in range(j_max,-1,-1):
+            if jump[node1][j] != jump[node2][j]:
+                node1,node2 = jump[node1][j],jump[node2][j]
 
-    return jump[node1][0]
+        return jump[node1][0]
+    else:
+        return node1
 
 if __name__ == "__main__":
     root = Node(1)
@@ -77,4 +81,6 @@ if __name__ == "__main__":
     depth,jump = find_depth_and_jump_array(root)
     print(f"depth:{depth}")
     print(f"jump:{jump}")
-    print(find_cls((6,8),depth,jump))
+    print(find_cls((8,9),depth,jump))
+    print(find_cls((5,9),depth,jump))
+    print(find_cls((7,6),depth,jump))
