@@ -22,15 +22,16 @@ import bisect
 def get_max_length_of_ascent_series2(s):
     minum_of_last_element_given_length = []
     for single_s in s:
-        update_index = bisect.bisect_right(minum_of_last_element_given_length,single_s) # minum_of_last_element_given_length is ascended
+        update_index = bisect.bisect_left(minum_of_last_element_given_length,single_s) # minum_of_last_element_given_length is ascended
         if update_index < len(minum_of_last_element_given_length):
-            if single_s < minum_of_last_element_given_length[update_index]:
-                minum_of_last_element_given_length[update_index] = single_s
+            minum_of_last_element_given_length[update_index] = single_s
         else:
             minum_of_last_element_given_length.append(single_s)
     return len(minum_of_last_element_given_length)
 
 if __name__ == "__main__":
-    s = [1,2,3,12,4,5,7,1,2,3]
-    print(f"s:{s}, max length:{get_max_length_of_ascent_series2(s)}")
+    import random
+    s = [random.randint(0,20) for _ in range(100)]
+    #s = [0, 15, 5, 17, 5, 8, 1, 7, 12, 19]
+    print(f"s:{s}, max length:{get_max_length_of_ascent_series(s)},max length:{get_max_length_of_ascent_series2(s)}")
 
