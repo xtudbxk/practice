@@ -31,7 +31,6 @@ def get_max_length_of_ascent_series2(s):
 
 if __name__ == "__main__":
     import random
-    s = [random.randint(0,20) for _ in range(100)]
-    #s = [0, 15, 5, 17, 5, 8, 1, 7, 12, 19]
+    s = [random.randint(0,100) for _ in range(1000)]
     print(f"s:{s}, max length:{get_max_length_of_ascent_series(s)},max length:{get_max_length_of_ascent_series2(s)}")
 

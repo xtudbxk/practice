@@ -20,39 +20,90 @@ def get_max_length_of_crisscross_series(array):
 
 # solver2:
 # 类似于最长上升子序列，可以使用辅助数组法, o(N)
+# 需注意由于交错序列本身的特点，细节上有许多不同
+# 辅助数组 dd,da,aa,ad, d代表下降，a代表上升， dd[length-2] 代表长度为length的, 开头为下降，未尾为下降的序列中 最后一位数字最小的值, 其余类同
+#
+# 以每个数字为当前数字进行循环:
+#     分别讨论四个辅助数组对应的四种情况:
+#        以dd为例:
+#        1. 在dd中查找当前数字能插入的位置
+#        2. 在da中根据位置更新相应的值
+#        3. 更新da，使其重新成为有序的list
+#
+
 import bisect
 def get_max_length_of_crisscross_series2(array):
-    min_number_of_series = [array[0]] # min_number_of_series[ length ] 表示最后一段为下降时，长度为length的序列中，最后一个为数字最小的值，易知其随着长度的增加而增加
-    negative_max_number_of_series = [-array[0]] # negative_max_number_of_series[ length ] 表示最后一段为上升时，长度为length的序列中，最后一个为数字最大的值的相反数, 易知其随着长度的增加而增加
+    # 在序列最前方虚拟两个数字，一个比array[0]小，一个比array[0]大，以便辅助数组初始化
+    fuzhu = [[array[0]],[],[-array[0]],[]] # 分别是 dd,da,aa,ad, 负号是为了让list都为升序排列
 
-    for num_index in range(1,len(array)):
-        # 可将当前数字插入的最长的最后一段为下降的序列的长度
-        length1 = bisect.bisect_left(min_number_of_series,array[num_index])
+    for cur_index in range(1,len(array)):
+        # get insert index
+        insert_index = []
+        for fuzhu_index in range(4):
+            if fuzhu_index in [1,2]: # da or aa
+                insert_index.append( bisect.bisect_left( fuzhu[fuzhu_index], -array[cur_index] ) )
+            else:
+                insert_index.append( bisect.bisect_left( fuzhu[fuzhu_index], array[cur_index] ) )
 
-        # 可将当前数字插入的最长的最后一段为上升的序列的长度
-        length2 = bisect.bisect_left(negative_max_number_of_series,-array[num_index])
-
-        # 将当前数字插入最后一段为下降时的序列后面，形成最后一段为上升的序列
-        if len(negative_max_number_of_series) < length1+1:
-            negative_max_number_of_series.append(-array[num_index]) # 形成新长度
+        # update fuzhu
+        # dd
+        update_index = insert_index[1]
+        if len(fuzhu[0]) > update_index:
+            fuzhu[0][update_index] = min(fuzhu[0][update_index],array[cur_index]) 
         else:
-            negative_max_number_of_series[length1] = min(negative_max_number_of_series[length1],-array[num_index])
-
-        # 将当前数字插入最后一段为上升时的序列后面，形成最后一段为下降的序列
-        if len(min_number_of_series) < length2+1:
-            min_number_of_series.append(array[num_index]) # 形成新长度
+            fuzhu[0].append(array[cur_index]) 
+        # da
+        update_index = insert_index[0]-1
+        if update_index >= 0:
+            if len(fuzhu[1]) > update_index:
+                fuzhu[1][update_index] = min(fuzhu[1][update_index],-array[cur_index]) # da
+            else:
+                fuzhu[1].append(-array[cur_index])
         else:
-            min_number_of_series[length2] = min(min_number_of_series[length2],array[num_index])
-        print(f"num_index:{num_index}")
-        print(f"min_number_of_series:{min_number_of_series}")
-        print(f"negative_max_number_of_series:{negative_max_number_of_series}")
-        
-    return max(len(min_number_of_series),len(negative_max_number_of_series))
+            fuzhu[0][0] = min(fuzhu[0][0],array[cur_index]) # 更新length=2对应的值
+        # aa
+        update_index = insert_index[3]
+        if len(fuzhu[2]) > update_index:
+            fuzhu[2][update_index] = min(fuzhu[2][update_index],-array[cur_index])
+        else:
+            fuzhu[2].append(-array[cur_index])
+        # ad
+        update_index = insert_index[2]-1
+        if update_index >= 0:
+            if len(fuzhu[3]) > update_index:
+                fuzhu[3][update_index] = min(fuzhu[3][update_index],array[cur_index])
+            else:
+                fuzhu[3].append(array[cur_index])
+        else:
+            fuzhu[2][0] = min(fuzhu[2][0],array[cur_index])
+
+        # reorder fuzhu
+        # dd
+        reorder_index = insert_index[1]-1
+        while(reorder_index >= 0 and fuzhu[0][reorder_index] > array[cur_index]):
+            fuzhu[0][reorder_index] = array[cur_index]
+            reorder_index -= 1
+        # da
+        reorder_index = insert_index[0]-2
+        while(reorder_index >= 0 and fuzhu[1][reorder_index] > -array[cur_index]):
+            fuzhu[1][reorder_index] = -array[cur_index]
+            reorder_index -= 1
+        # aa
+        reorder_index = insert_index[3]-1
+        while(reorder_index >= 0 and fuzhu[2][reorder_index] > -array[cur_index]):
+            fuzhu[2][reorder_index] = -array[cur_index]
+            reorder_index -= 1
+        # ad
+        reorder_index = insert_index[2]-2
+        while(reorder_index >= 0 and fuzhu[3][reorder_index] > array[cur_index]):
+            fuzhu[3][reorder_index] = array[cur_index]
+            reorder_index -= 1
+
+    return max( 2*max(len(fuzhu[0]),len(fuzhu[2])), 2*max(len(fuzhu[1]),len(fuzhu[3]))+1 )-1
 
 if __name__ == "__main__":
     import random
-    #array = [random.randint(0,20) for _ in range(10)]
-    array = [9,9,14,7,17,18,13,12,4,4]
+    array = [random.randint(0,100) for _ in range(1000)]
     print(f"array:{array},max length:{get_max_length_of_crisscross_series(array)},max length:{get_max_length_of_crisscross_series2(array)}")
 
 
